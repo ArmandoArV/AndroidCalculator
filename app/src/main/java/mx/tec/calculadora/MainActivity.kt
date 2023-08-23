@@ -19,6 +19,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private var numero1: String = ""
     private var operador: String = ""
 
+    companion object {
+        private const val TAG = "CalculatorApp"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -37,7 +41,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
 
     }
-    private var firstInput: Double = 0.0
+
+    private var firstInput: Int = 0
+    private var result: Int = 0
 
     val numberButtonMap = mapOf(
         R.id.btnCero to "0",
@@ -63,45 +69,61 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
 
             R.id.btnMas -> {
-                firstInput = numero1.toDouble() // Store the first input
+                firstInput = numero1.toInt() // Store the first input
                 operador = "+"
                 numero1 = ""
             }
 
             R.id.btnMenos -> {
-                firstInput = numero1.toDouble() // Store the first input
+                firstInput = numero1.toInt() // Store the first input
                 operador = "-"
                 numero1 = ""
             }
 
             R.id.btnPor -> {
-                firstInput = numero1.toDouble() // Store the first input
+                firstInput = numero1.toInt() // Store the first input
                 operador = "*"
                 numero1 = ""
             }
 
             R.id.btnEntre -> {
-                firstInput = numero1.toDouble() // Store the first input
+                firstInput = numero1.toInt() // Store the first input
                 operador = "/"
                 numero1 = ""
             }
 
-            // Equal button
             R.id.btnIgual -> {
+                Log.d(TAG, "Equal button clicked")
+
                 if (numero1.isNotEmpty() && operador.isNotEmpty()) {
-                    val numero2 = binding.txtResultado.text.toString().toDouble()
-                    var resultado: Double = 0.0
-                    when (operador) {
-                        "+" -> resultado = firstInput + numero2
-                        "-" -> resultado = firstInput - numero2
-                        "*" -> resultado = firstInput * numero2
-                        "/" -> resultado = firstInput / numero2
+                    val numero2 = numero1.toIntOrNull() ?: 0
+                    Log.d(TAG, "numero1: $firstInput, operador: $operador, numero2: $numero2")
+
+                    result = when (operador) {
+                        "+" -> firstInput + numero2
+                        "-" -> firstInput - numero2
+                        "*" -> firstInput * numero2
+                        "/" -> {
+                            if (numero2 != 0) {
+                                firstInput / numero2
+                            } else {
+                                Log.e(TAG, "Division by zero")
+                                0
+                            }
+                        }
+
+                        else -> {
+                            Log.e(TAG, "Invalid operator: $operador")
+                            0
+                        }
                     }
-                    binding.txtResultado.text = resultado.toString()
-                    numero1 = "" // Clear numero1
-                    operador = ""
+
+                    binding.txtResultado.text = result.toString() // Display the result
+                    numero1 = result.toString() // Update numero1 with the result
+                    operador = "" // Clear the operator
                 }
             }
+
 
             // Reset button
             R.id.btnReset -> {
